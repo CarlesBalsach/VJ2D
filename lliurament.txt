@@ -1,0 +1,4 @@
+Host: pctic0405.lsi.upc.edu
+port 22
+usuari: uservj11
+pass: yC0JISAr
