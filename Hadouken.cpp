@@ -17,11 +17,20 @@ void Hadouken::draw()
 	glEnable(GL_TEXTURE_2D);
 	
 	glBindTexture(GL_TEXTURE_2D,tex.GetID());
-	glBegin(GL_QUADS);	
+	glBegin(GL_QUADS);
+	if(vx<0) {
+		glTexCoord2f(1,0); glVertex2i(x,y);
+		glTexCoord2f(0,0); glVertex2i(x+w,y);
+		glTexCoord2f(0,1); glVertex2i(x+w,y+h);
+		glTexCoord2f(1,1); glVertex2i(x,y+h);
+	}
+	else
+	{
 		glTexCoord2f(0,0); glVertex2i(x,y);
 		glTexCoord2f(1,0); glVertex2i(x+w,y);
 		glTexCoord2f(1,1); glVertex2i(x+w,y+h);
 		glTexCoord2f(0,1); glVertex2i(x,y+h);
+	}
 	glEnd();
 
 	glDisable(GL_TEXTURE_2D);

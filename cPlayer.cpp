@@ -5,6 +5,7 @@
 
 cPlayer::cPlayer() {
 	inputs = vector<int>(3,0);
+	shootAnimationFrame = -1;
 }
 cPlayer::~cPlayer(){}
 
@@ -14,9 +15,43 @@ void cPlayer::Logic(int *map, bool forward)
 	for(unsigned int i=0; i<hadoukens.size(); i++) hadoukens[i].logic();
 }
 
+void cPlayer::MoveRight(int *map)
+{
+	int myState = state;
+	cBicho::MoveRight(map);
+	if(myState == STATE_SHOOTING_LEFT || myState == STATE_SHOOTING_RIGHT) state = myState;
+}
+void cPlayer::MoveLeft(int *map)
+{
+	int myState = state;
+	cBicho::MoveLeft(map);
+	if(myState == STATE_SHOOTING_LEFT || myState == STATE_SHOOTING_RIGHT) state = myState;
+}
+void cPlayer::Jump(int *map)
+{
+	int myState = state;
+	cBicho::Jump(map);
+	if(myState == STATE_SHOOTING_LEFT || myState == STATE_SHOOTING_RIGHT) state = myState;
+}
+void cPlayer::StopJumping(int *map)
+{
+	int myState = state;
+	cBicho::StopJumping(map);
+	if(myState == STATE_SHOOTING_LEFT || myState == STATE_SHOOTING_RIGHT) state = myState;
+}
+void cPlayer::Stop()
+{
+	int myState = state;
+	cBicho::Stop();
+	if(myState == STATE_SHOOTING_LEFT || myState == STATE_SHOOTING_RIGHT) state = myState;
+}
+
 void cPlayer::Draw(int tex_id, bool forward)
 {	
 	float xo,yo,xf,yf;
+
+	//backwards int time was causing inconsistence between both variables, after spending some time i decided to patch it with this shit
+	if(shootAnimationFrame != -1 && !(state == STATE_SHOOTING_LEFT || state == STATE_SHOOTING_RIGHT)) shootAnimationFrame = -1;
 
 	switch(GetState())
 	{
@@ -34,6 +69,30 @@ void cPlayer::Draw(int tex_id, bool forward)
 		case STATE_WALKRIGHT:	xo = 0.25f; yo = 0.25f + (GetFrame()*0.25f);
 								NextFrame(3);
 								break;
+		case STATE_SHOOTING_LEFT:
+		{
+			int hadAnim = (shootAnimationFrame/7)%2;
+			xo = 0.0f + (hadAnim*0.25f); yo = 1.0f;
+			shootAnimationFrame++;
+			if(shootAnimationFrame==21)
+			{
+				state = STATE_LOOKLEFT;
+				shootAnimationFrame = -1;
+			}
+			break;
+		}
+		case STATE_SHOOTING_RIGHT:
+		{
+			int hadAnim = (shootAnimationFrame/7)%2;
+			xo = 0.5f + (hadAnim*0.25f); yo = 1.0f;
+			shootAnimationFrame++;
+			if(shootAnimationFrame==21)
+			{
+				state = STATE_LOOKRIGHT;
+				shootAnimationFrame = -1;
+			}
+			break;
+		}
 	}
 	xf = xo + 0.25f;
 	yf = yo - 0.25f;
@@ -78,5 +137,22 @@ void cPlayer::addInput(int input)
 
 void cPlayer::addHadouken()
 {
-	hadoukens.push_back(Hadouken(x+2*w,y+h,3));
+	if(shootAnimationFrame == -1) {
+		int hx = x+w/2;
+		int hy = y+h;
+		int hadoukenSpeed = 3;
+		if(state == STATE_LOOKRIGHT || state == STATE_WALKRIGHT)
+		{
+			hx+=w;
+			state = STATE_SHOOTING_RIGHT;
+			shootAnimationFrame = 0;
+		}
+		if(state == STATE_LOOKLEFT || state == STATE_WALKLEFT)
+		{
+			hadoukenSpeed*=-1;
+			state = STATE_SHOOTING_LEFT;
+			shootAnimationFrame = 0;
+		}
+		hadoukens.push_back(Hadouken(hx,hy,hadoukenSpeed));
+	}
 }

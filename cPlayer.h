@@ -4,8 +4,8 @@
 #include "Hadouken.h"
 #include <vector>
 
-#define PLAYER_START_CX		3
-#define PLAYER_START_CY		2
+#define STATE_SHOOTING_LEFT 4
+#define STATE_SHOOTING_RIGHT 5
 
 class cPlayer: public cBicho
 {
@@ -16,8 +16,16 @@ public:
 	void Draw(int tex_id, bool forward);
 	void addInput(int input);
 	
+	//overriding to avoid animation states override
+	void MoveRight(int *map);
+	void MoveLeft(int *map);
+	void Jump(int *map);
+	void StopJumping(int *map);
+	void Stop();
+
 private:
 	void addHadouken();
 	vector<Hadouken> hadoukens;
 	vector<int> inputs;
+	int shootAnimationFrame;
 };

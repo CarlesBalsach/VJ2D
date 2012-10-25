@@ -82,11 +82,13 @@ bool cGame::Process()
 	else Player1.Stop();
 	forward = !keys[9]; //tab key
 	//hadouken
-	if(forward && keys[GLUT_KEY_RIGHT]) Player1.addInput(GLUT_KEY_RIGHT);
-	if(forward && keys[GLUT_KEY_LEFT]) Player1.addInput(GLUT_KEY_LEFT);
-	if(forward && keys[GLUT_KEY_DOWN]) Player1.addInput(GLUT_KEY_DOWN); 
-	if(forward && keys[32]) Player1.addInput(32);
-	
+	if(forward)
+	{
+		if(forward && keys[GLUT_KEY_RIGHT]) Player1.addInput(GLUT_KEY_RIGHT);
+		if(forward && keys[GLUT_KEY_LEFT]) Player1.addInput(GLUT_KEY_LEFT);
+		if(forward && keys[GLUT_KEY_DOWN]) Player1.addInput(GLUT_KEY_DOWN); 
+		if(forward && keys[32]) Player1.addInput(32);
+	}
 	//Game Logic
 	Player1.Logic(Scene.GetMap(),forward);
 	Player2.Logic(Scene.GetMap(),forward);
