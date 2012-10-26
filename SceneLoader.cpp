@@ -47,8 +47,9 @@ void SceneLoader::update (float dt)
 }
 
 
-void draw_scene (int tex_id, cScene* scene, float ty)
+void draw_scene (int tex_id, cScene* scene, float ty, float a)
 {
+	glColor4f (1.0f, 1.0f, 1.0f, a);
 	glPushMatrix ();
 	glLoadIdentity ();
 	glTranslatef (0.0f, ty, 0.0f);
@@ -59,8 +60,12 @@ void draw_scene (int tex_id, cScene* scene, float ty)
 
 void SceneLoader::render (int tex_id)
 {
-	if (scene_prev && scene_prev != scene_cur) draw_scene (tex_id, scene_prev, ty);
-	if (scene_cur) draw_scene (tex_id, scene_cur, 0.0f);
+	glEnable (GL_BLEND);
+	float p = elapsed == 0.0f ? 1.0f : elapsed / animationTime;
+	if (scene_prev && scene_prev != scene_cur) draw_scene (tex_id, scene_prev, ty, 1.0f - p);
+	if (scene_cur) draw_scene (tex_id, scene_cur, 0.0f, p);
+	glDisable (GL_BLEND);
+	glColor3f (1.0f, 1.0f, 1.0f);
 }
 
 
