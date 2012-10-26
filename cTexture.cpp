@@ -9,6 +9,7 @@ cTexture::cTexture(void)
 
 cTexture::~cTexture(void)
 {
+	glDeleteTextures (1, &id);
 }
 
 bool cTexture::Load(char *filename,int type,int wraps,int wrapt,int magf,int minf,bool mipmap)
