@@ -1,6 +1,7 @@
 
 #include "Globals.h"
 #include "cGame.h"
+#include "guicon.h"
 
 //Delete console
 #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
@@ -33,18 +34,37 @@ void AppMouse(int button, int state, int x, int y)
 {
 	Game.ReadMouse(button,state,x,y);
 }
+
+float tick ()
+{
+    return ((float) glutGet (GLUT_ELAPSED_TIME)) / 1000.0f;
+}
+
+float last_tick = 0.0f;
+
 void AppIdle()
 {
-	int time =  glutGet(GLUT_ELAPSED_TIME);
-	if(!Game.Loop()) exit(0);
-	int delta_t = glutGet(GLUT_ELAPSED_TIME)- time;
-	int sleepTime = TPF - delta_t;
+	float start = tick ();
+    float dt = start - last_tick;
+    last_tick = start;
+
+	if(!Game.Loop(dt)) exit(0);
+
+	float frame_time = tick () - start;
+	//int delta_t = glutGet(GLUT_ELAPSED_TIME)- time;
+	//int sleepTime = TPF - delta_t;
+	int sleepTime = TPF - ((int)(frame_time * 1000.0f));
 	if(sleepTime > 10) Sleep(sleepTime);
 }
 
 void main(int argc, char** argv)
 {
 	int res_x,res_y,pos_x,pos_y;
+
+	// Open console in debug mode
+#ifdef _DEBUG
+	open_console ();
+#endif
 
 	//GLUT initialization
 	glutInit(&argc, argv);
@@ -81,5 +101,5 @@ void main(int argc, char** argv)
 	Game.Init();
 
 	//Application loop
-	glutMainLoop();	
+	glutMainLoop();
 }

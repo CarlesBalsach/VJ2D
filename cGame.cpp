@@ -1,8 +1,9 @@
 #include "cGame.h"
+#include "cScene.h"
 #include "Globals.h"
 
 
-cGame::cGame(void)
+cGame::cGame(void) : lastTick (0.0f)
 {
 }
 
@@ -16,6 +17,7 @@ bool cGame::Init()
 
 	//Graphics initialization
 	glClearColor(0.0f,0.0f,0.0f,0.0f);
+	glDisable (GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0,GAME_WIDTH,0,GAME_HEIGHT,0,1);
@@ -27,7 +29,7 @@ bool cGame::Init()
 	//Scene initialization
 	res = Data.LoadImage(IMG_BLOCKS,"blocks.png",GL_RGBA);
 	if(!res) return false;
-	res = Scene.LoadLevel(2);
+	res = sceneLoader.nextLevel();
 	if(!res) return false;
 
 	//Player initialization
@@ -44,11 +46,11 @@ bool cGame::Init()
 	return res;
 }
 
-bool cGame::Loop()
+bool cGame::Loop(float dt)
 {
 	bool res=true;
 
-	res = Process();
+	res = Process(dt);
 	if(res) Render();
 
 	return res;
@@ -69,11 +71,15 @@ void cGame::ReadMouse(int button, int state, int x, int y)
 }
 
 //Process
-bool cGame::Process()
+bool cGame::Process(float dt)
 {
 	bool res=true;
 	//Process Input
 	if(keys[27])	res=false;
+
+	// Scene loader
+	sceneLoader.update(dt);
+	cScene& Scene = sceneLoader.currentScene();
 	
 	if(keys[GLUT_KEY_UP])			Player1.Jump(Scene.GetMap());
 	if(!keys[GLUT_KEY_UP])			Player1.StopJumping(Scene.GetMap());
@@ -92,6 +98,15 @@ bool cGame::Process()
 	//Game Logic
 	Player1.Logic(Scene.GetMap(),forward);
 	Player2.Logic(Scene.GetMap(),forward);
+
+	// Scene loader debug
+	static float last_load = 0.0f;
+	last_load += dt;
+	if (keys['j'] && last_load > 2.0f)
+	{
+		last_load = 0.0f;
+		sceneLoader.nextLevel();
+	}
 
 	return res;
 }
@@ -121,7 +136,7 @@ void cGame::Render()
 
 	glLoadIdentity();
 
-	Scene.Draw(Data.GetID(IMG_BLOCKS));
+	sceneLoader.render(Data.GetID(IMG_BLOCKS));
 	Player1.Draw(Data.GetID(IMG_PLAYER), forward);
 	Player2.Draw(Data.GetID(IMG_PLAYER), forward);
 
