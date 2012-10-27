@@ -81,7 +81,7 @@ void Monster1::Draw (int tex_id)
 	xf = xo + 0.25f;
 	yf = yo - 0.25f;
 
-	glColor3f (0.2f, 0.2f, 0.2f);
+	glColor3f (1.0f, 0.0f, 0.0f);
 	DrawRect(tex_id,xo,yo,xf,yf);
 	glColor3f (1.0f, 1.0f, 1.0f);
 }
