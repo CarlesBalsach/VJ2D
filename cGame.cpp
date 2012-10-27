@@ -16,7 +16,7 @@ bool cGame::Init()
 	bool res=true;
 
 	//Graphics initialization
-	glClearColor(0.0f,0.0f,0.0f,0.0f);
+	glClearColor(0.2f,0.4f,0.7f,0.0f);
 	glDisable (GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -42,6 +42,13 @@ bool cGame::Init()
 	Player2.SetWidthHeight(32,32);
 	Player2.SetTile(30,1);
 	Player2.SetState(STATE_LOOKLEFT);
+
+	//Monster1 initialization
+	for (int i = 0; i < NUM_MONSTERS; ++i)
+	{
+		monsters1[i].SetWidthHeight(32, 32);
+		monsters1[i].Randomise();
+	}
 
 	return res;
 }
@@ -98,6 +105,10 @@ bool cGame::Process(float dt)
 	//Game Logic
 	Player1.Logic(Scene.GetMap(),forward);
 	Player2.Logic(Scene.GetMap(),forward);
+	for (int i = 0; i < NUM_MONSTERS; ++i)
+	{
+		monsters1[i].Logic(Scene.GetMap(), forward);
+	}
 
 	// Scene loader debug
 	static float last_load = 0.0f;
@@ -105,10 +116,21 @@ bool cGame::Process(float dt)
 	if (keys['j'] && last_load > 2.0f)
 	{
 		last_load = 0.0f;
-		sceneLoader.nextLevel();
+		nextLevel ();
 	}
 
 	return res;
+}
+
+void cGame::nextLevel ()
+{
+	// Generate random monsters.
+	for (int i = 0; i < NUM_MONSTERS; ++i)
+	{
+		monsters1[i].Randomise();
+	}
+
+	sceneLoader.nextLevel();
 }
 
 void cGame::drawBackInTime()
@@ -128,7 +150,6 @@ void cGame::drawBackInTime()
 //Output
 void cGame::Render()
 {
-	glClearColor(0,0,0,1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	if(forward) glColor4f(1,1,1,1);
@@ -139,6 +160,11 @@ void cGame::Render()
 	sceneLoader.render(Data.GetID(IMG_BLOCKS));
 	Player1.Draw(Data.GetID(IMG_PLAYER), forward);
 	Player2.Draw(Data.GetID(IMG_PLAYER), forward);
+
+	for (int i = 0; i < NUM_MONSTERS; ++i)
+	{
+		monsters1[i].Draw(Data.GetID(IMG_PLAYER));
+	}
 
 	if(!forward) drawBackInTime();
 

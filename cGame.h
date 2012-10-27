@@ -2,6 +2,7 @@
 
 #include "SceneLoader.h"
 #include "cPlayer.h"
+#include "Monster1.h"
 #include "cData.h"
 
 #define GAME_WIDTH	640
@@ -26,13 +27,18 @@ public:
 	void Render();
 
 private:
+	static const int NUM_MONSTERS = 8;
+
 	bool forward;
 	void drawBackInTime();
+
+	void nextLevel ();
 
 	unsigned char keys[256];
 	SceneLoader sceneLoader;
 	cPlayer Player1;
 	cPlayer Player2;
+	Monster1 monsters1[NUM_MONSTERS];
 	cData Data;
 
 	float lastTick;
