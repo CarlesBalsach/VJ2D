@@ -10,10 +10,13 @@ using namespace std;
 #define JUMP_HEIGHT		8
 #define JUMP_STEP		5
 
-#define STATE_LOOKLEFT		0
-#define STATE_LOOKRIGHT		1
-#define STATE_WALKLEFT		2
-#define STATE_WALKRIGHT		3
+#define STATE_LOOKLEFT			0
+#define STATE_LOOKRIGHT			1
+#define STATE_WALKLEFT			2
+#define STATE_WALKRIGHT			3
+#define STATE_SHOOTING_LEFT		4
+#define STATE_SHOOTING_RIGHT	5
+#define STATE_DEAD				6
 
 class cRect
 {

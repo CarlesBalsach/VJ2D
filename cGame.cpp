@@ -90,21 +90,25 @@ bool cGame::Process(float dt)
 	// Scene loader
 	sceneLoader.update(dt);
 	cScene& Scene = sceneLoader.currentScene();
-	
-	if(keys[GLUT_KEY_UP])			Player1.Jump(Scene.GetMap());
-	if(!keys[GLUT_KEY_UP])			Player1.StopJumping(Scene.GetMap());
-	if(keys[GLUT_KEY_LEFT])			Player1.MoveLeft(Scene.GetMap());
-	else if(keys[GLUT_KEY_RIGHT])	Player1.MoveRight(Scene.GetMap());
-	else Player1.Stop();
-	forward = !keys[9]; //tab key
-	//hadouken
-	if(forward)
+	if(!Player1.isDead())
 	{
-		if(forward && keys[GLUT_KEY_RIGHT]) Player1.addInput(GLUT_KEY_RIGHT);
-		if(forward && keys[GLUT_KEY_LEFT]) Player1.addInput(GLUT_KEY_LEFT);
-		if(forward && keys[GLUT_KEY_DOWN]) Player1.addInput(GLUT_KEY_DOWN); 
-		if(forward && keys[32]) Player1.addInput(32);
+		if(keys[GLUT_KEY_UP])			Player1.Jump(Scene.GetMap());
+		if(!keys[GLUT_KEY_UP])			Player1.StopJumping(Scene.GetMap());
+		if(keys[GLUT_KEY_LEFT])			Player1.MoveLeft(Scene.GetMap());
+		else if(keys[GLUT_KEY_RIGHT])	Player1.MoveRight(Scene.GetMap());
+		else Player1.Stop();
+		forward = !keys[9]; //tab key
+		//hadouken
+		if(forward)
+		{
+			if(forward && keys[GLUT_KEY_RIGHT]) Player1.addInput(GLUT_KEY_RIGHT);
+			if(forward && keys[GLUT_KEY_LEFT]) Player1.addInput(GLUT_KEY_LEFT);
+			if(forward && keys[GLUT_KEY_DOWN]) Player1.addInput(GLUT_KEY_DOWN); 
+			if(forward && keys[32]) Player1.addInput(32);
+		}
 	}
+	else Player1.toSpawnZone(4,1);
+
 	//Game Logic
 	Player1.Logic(Scene.GetMap(),forward);
 	Player2.Logic(Scene.GetMap(),forward);

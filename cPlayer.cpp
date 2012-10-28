@@ -2,16 +2,20 @@
 #include "cPlayer.h"
 #include "glut.h"
 #include <assert.h>
+#include "cBicho.h"
+#include "cScene.h"
 
 cPlayer::cPlayer() {
 	inputs = vector<int>(3,0);
 	shootAnimationFrame = -1;
+	dead = false;
+	lives = 3;
 }
 cPlayer::~cPlayer(){}
 
 void cPlayer::Logic(int *map, bool forward)
 {
-	cBicho::Logic(map,forward);
+	if(!dead) cBicho::Logic(map,forward);
 	for(unsigned int i=0; i<hadoukens.size(); i++) hadoukens[i].logic();
 }
 
@@ -44,6 +48,29 @@ void cPlayer::Stop()
 	int myState = state;
 	cBicho::Stop();
 	if(myState == STATE_SHOOTING_LEFT || myState == STATE_SHOOTING_RIGHT) state = myState;
+}
+
+void cPlayer::toSpawnZone(int tileX, int tileY)
+{
+	int destX = tileX * TILE_SIZE;
+	int destY = tileY * TILE_SIZE;
+	float dx = (destX - x)/30.0f;
+	float dy = (destY - y)/30.0f;
+
+	if(dx < 0 && dx > -1) dx = -1;
+	else if(dx > 0 && dx < 1) dx = 1;
+	if(dy < 0 && dy > -1) dy = -1;
+	else if(dy > 0 && dy < 1) dy = 1;
+
+	x += dx;
+	y += dy;
+	if(x == destX && y == destY)
+	{
+		state = STATE_LOOKRIGHT;
+		dead = false;
+		jumping = false;
+		states.clear();
+	}
 }
 
 void cPlayer::Draw(int tex_id, bool forward)
@@ -93,6 +120,10 @@ void cPlayer::Draw(int tex_id, bool forward)
 			}
 			break;
 		}
+		case STATE_DEAD:
+			xo = 0.75f;	yo = 0.25f + (GetFrame()*0.25f);
+			NextFrame(3);
+			break;
 	}
 	xf = xo + 0.25f;
 	yf = yo - 0.25f;
@@ -160,12 +191,20 @@ void cPlayer::addHadouken()
 void cPlayer::MonstersCollisions(vector<Monster1>& monsters1)
 {
 	vector<Monster1>::iterator mit;
-	for(mit = monsters1.begin(); mit != monsters1.end(); mit++)
+	if(!dead)
 	{
-		if(Collides(mit->GetArea()))
+		for(mit = monsters1.begin(); mit != monsters1.end(); mit++)
 		{
-			SetTile(4,1);
-			SetState(STATE_LOOKRIGHT);
+			if(Collides(mit->GetArea()))
+			{
+				lives--;
+				if(lives == 0)
+				{
+					//some code here
+				}
+				dead = true;
+				state = STATE_DEAD;
+			}
 		}
 	}
 
@@ -183,4 +222,9 @@ void cPlayer::MonstersCollisions(vector<Monster1>& monsters1)
 		}
 		if(mit == monsters1.end()) break;
 	}
+}
+
+bool cPlayer::isDead()
+{
+	return dead;
 }
