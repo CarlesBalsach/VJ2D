@@ -14,8 +14,8 @@ Monster1::~Monster1(void)
 
 void Monster1::Randomise ()
 {
-	int x = rand() % (SCENE_WIDTH-8);
-	int y = rand() % (SCENE_HEIGHT-4);
+	int x = rand() % (SCENE_WIDTH-10);
+	int y = rand() % (SCENE_HEIGHT-8);
 	SetTile (x, y);
 
 	int d = rand() % 2;
