@@ -21,13 +21,14 @@ cBicho::cBicho(int posx,int posy,int width,int height)
 	y = posy;
 	w = width;
 	h = height;
+	jumping = false;
 }
 void cBicho::SetPosition(int posx,int posy)
 {
 	x = posx;
 	y = posy;
 }
-void cBicho::GetPosition(int *posx,int *posy)
+void cBicho::GetPosition(int *posx,int *posy) const
 {
 	*posx = x;
 	*posy = y;
@@ -37,7 +38,7 @@ void cBicho::SetTile(int tx,int ty)
 	x = tx * TILE_SIZE;
 	y = ty * TILE_SIZE;
 }
-void cBicho::GetTile(int *tx,int *ty)
+void cBicho::GetTile(int *tx,int *ty) const
 {
 	*tx = x / TILE_SIZE;
 	*ty = y / TILE_SIZE;
@@ -47,16 +48,16 @@ void cBicho::SetWidthHeight(int width,int height)
 	w = width;
 	h = height;
 }
-void cBicho::GetWidthHeight(int *width,int *height)
+void cBicho::GetWidthHeight(int *width,int *height) const
 {
 	*width = w;
 	*height = h;
 }
-bool cBicho::Collides(cRect rc)
+bool cBicho::Collides(cRect rc) const
 {
 	return !((x>rc.right) || (x+w<rc.left) || (y>rc.top) || (y+h<rc.bottom));
 }
-bool cBicho::CollidesMapWall(int *map,bool right)
+bool cBicho::CollidesMapWall(int *map,bool right) const
 {
 	int tile_x,tile_y;
 	int j;
@@ -112,7 +113,7 @@ bool cBicho::CollidesMapFloor(int *map)
 	return on_base;
 }
 
-cRect cBicho::GetArea()
+cRect cBicho::GetArea() const
 {
 	cRect rc;
 	rc.left   = x;
@@ -121,7 +122,7 @@ cRect cBicho::GetArea()
 	rc.top    = y+h;
 	return rc;
 }
-void cBicho::DrawRect(int tex_id,float xo,float yo,float xf,float yf)
+void cBicho::DrawRect(int tex_id,float xo,float yo,float xf,float yf) const
 {
 	int screen_x,screen_y;
 
@@ -280,13 +281,13 @@ void cBicho::NextFrame(int max)
 		delay = 0;
 	}
 }
-int cBicho::GetFrame()
+int cBicho::GetFrame() const
 {
 	return seq;
 }
 
 //i think those are realted with sprites (walking, etc)
-int cBicho::GetState()
+int cBicho::GetState() const
 {
 	return state;
 }
@@ -301,7 +302,7 @@ void cBicho::addState()
 	states.push_back(getBichoState());
 }
 
-cBichoState cBicho::getBichoState()
+cBichoState cBicho::getBichoState() const
 {
 	cBichoState bState;
 	bState.x = x;

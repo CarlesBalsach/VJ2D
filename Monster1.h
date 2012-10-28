@@ -6,6 +6,7 @@ class Monster1 : public cBicho
 {
 	enum Direction { left, right };
 	Direction dir;
+	bool alive;
 
 public:
 	Monster1(void);
@@ -15,5 +16,9 @@ public:
 
 	void Logic(int *map, bool forward);
 
-	void Draw (int tex_id);
+	void Draw (int tex_id) const;
+
+	void setAlive (bool val);
+
+	bool isAlive () const;
 };

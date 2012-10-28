@@ -44,17 +44,17 @@ public:
 	~cBicho(void);
 
 	void SetPosition(int x,int y);
-	void GetPosition(int *x,int *y);
+	void GetPosition(int *x,int *y) const;
 	void SetTile(int tx,int ty);
-	void GetTile(int *tx,int *ty);
+	void GetTile(int *tx,int *ty) const;
 	void SetWidthHeight(int w,int h);
-	void GetWidthHeight(int *w,int *h);
+	void GetWidthHeight(int *w,int *h) const;
 
-	bool Collides(cRect rc);
-	bool CollidesMapWall(int *map,bool right);
+	bool Collides(cRect rc) const;
+	bool CollidesMapWall(int *map,bool right) const;
 	bool CollidesMapFloor(int *map);
-	cRect GetArea();
-	void DrawRect(int tex_id,float xo,float yo,float xf,float yf);
+	cRect GetArea() const;
+	void DrawRect(int tex_id,float xo,float yo,float xf,float yf) const;
 
 	void MoveRight(int *map);
 	void MoveLeft(int *map);
@@ -63,15 +63,15 @@ public:
 	void Stop();
 	void Logic(int *map, bool forward);
 
-	int  GetState();
+	int  GetState() const;
 	void SetState(int s);
 
 	void NextFrame(int max);
-	int  GetFrame();
+	int  GetFrame() const;
 	
 	//this state is related with going backwards in time
 	void addState();
-	cBichoState getBichoState();
+	cBichoState getBichoState() const;
 	void setBichoState(cBichoState bState);
 protected:
 	vector<cBichoState> states;

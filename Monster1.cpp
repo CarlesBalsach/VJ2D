@@ -2,7 +2,7 @@
 #include "cScene.h"
 
 
-Monster1::Monster1(void) : dir (left)
+Monster1::Monster1(void) : dir (left), alive (true)
 {
 }
 
@@ -29,12 +29,16 @@ void Monster1::Randomise ()
 		dir = right;
 		SetState(STATE_WALKRIGHT);
 	}
+	alive = true;
+	jumping = false;
 }
 
 
 void Monster1::Logic(int *map, bool forward)
 {
+	if (!alive) return;
 	cBicho::Logic (map, forward);
+	jumping = false;
 
 	// Move from one end of the platform to the other.
 	int old_x = x;
@@ -65,8 +69,10 @@ void Monster1::Logic(int *map, bool forward)
 }
 
 
-void Monster1::Draw (int tex_id)
+void Monster1::Draw (int tex_id) const
 {
+	if (!alive) return;
+
 	float xo, yo, xf, yf;
 	switch(GetState())
 	{
@@ -84,4 +90,16 @@ void Monster1::Draw (int tex_id)
 	glColor3f (1.0f, 0.0f, 0.0f);
 	DrawRect(tex_id,xo,yo,xf,yf);
 	glColor3f (1.0f, 1.0f, 1.0f);
+}
+
+
+void Monster1::setAlive (bool val)
+{
+	alive = val;
+}
+
+
+bool Monster1::isAlive () const
+{
+	return alive;
 }

@@ -4,7 +4,7 @@
 #include <cstring> // memset
 
 
-cGame::cGame(void) : lastTick (0.0f), status (Menu)
+cGame::cGame(void) : forward (false), lastTick (0.0f), status (Menu)
 {
 	memset (buttons, 0, sizeof(buttons));
 	memset (keys, 0, sizeof(keys));
@@ -47,13 +47,11 @@ bool cGame::Init()
 	Player2.SetState(STATE_LOOKLEFT);
 
 	//Monster1 initialization
-	monsters1 = std::vector<Monster1>(NUM_MONSTERS);
+	monsters1.resize(NUM_MONSTERS);
 	for (int i = 0; i < NUM_MONSTERS; ++i)
 	{
-		Monster1 monster;
-		monster.SetWidthHeight(32, 32);
-		monster.Randomise();
-		monsters1.push_back(monster);
+		monsters1[i].SetWidthHeight(32, 32);
+		monsters1[i].Randomise();
 	}
 
 	//Menu initialization.
@@ -166,7 +164,9 @@ bool cGame::Process(float dt)
 	// Scene loader
 	sceneLoader.update(dt);
 	cScene& Scene = sceneLoader.currentScene();
-	Player2.IA(Scene.GetMap(),Player1.GetArea());
+	
+	//Player2.IA(Scene.GetMap(),Player1.GetArea());
+	
 	if(!Player1.isDead())
 	{
 		if(keys[GLUT_KEY_UP])			Player1.Jump(Scene.GetMap());

@@ -195,7 +195,7 @@ void cPlayer::MonstersCollisions(vector<Monster1>& monsters1)
 	{
 		for(mit = monsters1.begin(); mit != monsters1.end(); mit++)
 		{
-			if(Collides(mit->GetArea()))
+			if(mit->isAlive() && Collides(mit->GetArea()))
 			{
 				lives--;
 				if(lives == 0)
@@ -213,9 +213,10 @@ void cPlayer::MonstersCollisions(vector<Monster1>& monsters1)
 		vector<Hadouken>::iterator hit;
 		for(hit = hadoukens.begin(); hit != hadoukens.end(); hit++)
 		{
-			if(mit->Collides(hit->getArea()))
+			if(mit->isAlive() && mit->Collides(hit->getArea()))
 			{
-				mit = monsters1.erase(mit);
+				printf ("monster hit\n");
+				mit->setAlive (false);
 				hit = hadoukens.erase(hit);
 			}
 			if(hit == hadoukens.end()) break;
