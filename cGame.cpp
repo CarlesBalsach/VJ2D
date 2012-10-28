@@ -90,6 +90,7 @@ bool cGame::Process(float dt)
 	// Scene loader
 	sceneLoader.update(dt);
 	cScene& Scene = sceneLoader.currentScene();
+	Player2.IA(Scene.GetMap(),Player1.GetArea());
 	if(!Player1.isDead())
 	{
 		if(keys[GLUT_KEY_UP])			Player1.Jump(Scene.GetMap());

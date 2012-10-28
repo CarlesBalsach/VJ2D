@@ -24,6 +24,7 @@ public:
 
 	void MonstersCollisions(vector<Monster1>& monsters1);
 	bool isDead();
+	void IA(int * map, cRect enemy);
 
 private:
 	void addHadouken();

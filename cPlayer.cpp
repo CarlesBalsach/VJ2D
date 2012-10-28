@@ -228,3 +228,10 @@ bool cPlayer::isDead()
 {
 	return dead;
 }
+
+void cPlayer::IA(int * map, cRect enemy)
+{
+	if(enemy.left < x) MoveLeft(map);
+	else MoveRight(map);
+	if(enemy.top > y && enemy.bottom < y + h) addHadouken();
+}
