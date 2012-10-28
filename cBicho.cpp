@@ -52,9 +52,9 @@ void cBicho::GetWidthHeight(int *width,int *height)
 	*width = w;
 	*height = h;
 }
-bool cBicho::Collides(cRect *rc)
+bool cBicho::Collides(cRect rc)
 {
-	return ((x>rc->left) && (x+w<rc->right) && (y>rc->bottom) && (y+h<rc->top));
+	return !((x>rc.right) || (x+w<rc.left) || (y>rc.top) || (y+h<rc.bottom));
 }
 bool cBicho::CollidesMapWall(int *map,bool right)
 {
@@ -112,12 +112,14 @@ bool cBicho::CollidesMapFloor(int *map)
 	return on_base;
 }
 
-void cBicho::GetArea(cRect *rc)
+cRect cBicho::GetArea()
 {
-	rc->left   = x;
-	rc->right  = x+w;
-	rc->bottom = y;
-	rc->top    = y+h;
+	cRect rc;
+	rc.left   = x;
+	rc.right  = x+w;
+	rc.bottom = y;
+	rc.top    = y+h;
+	return rc;
 }
 void cBicho::DrawRect(int tex_id,float xo,float yo,float xf,float yf)
 {

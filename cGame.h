@@ -52,7 +52,7 @@ private:
 	SceneLoader sceneLoader;
 	cPlayer Player1;
 	cPlayer Player2;
-	Monster1 monsters1[NUM_MONSTERS];
+	std::vector<Monster1> monsters1;
 	cData Data;
 	::Menu* menu;
 

@@ -10,10 +10,13 @@ using namespace std;
 #define JUMP_HEIGHT		8
 #define JUMP_STEP		5
 
-#define STATE_LOOKLEFT		0
-#define STATE_LOOKRIGHT		1
-#define STATE_WALKLEFT		2
-#define STATE_WALKRIGHT		3
+#define STATE_LOOKLEFT			0
+#define STATE_LOOKRIGHT			1
+#define STATE_WALKLEFT			2
+#define STATE_WALKRIGHT			3
+#define STATE_SHOOTING_LEFT		4
+#define STATE_SHOOTING_RIGHT	5
+#define STATE_DEAD				6
 
 class cRect
 {
@@ -47,10 +50,10 @@ public:
 	void SetWidthHeight(int w,int h);
 	void GetWidthHeight(int *w,int *h);
 
-	bool Collides(cRect *rc);
+	bool Collides(cRect rc);
 	bool CollidesMapWall(int *map,bool right);
 	bool CollidesMapFloor(int *map);
-	void GetArea(cRect *rc);
+	cRect GetArea();
 	void DrawRect(int tex_id,float xo,float yo,float xf,float yf);
 
 	void MoveRight(int *map);

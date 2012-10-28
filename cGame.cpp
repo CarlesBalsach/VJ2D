@@ -47,10 +47,13 @@ bool cGame::Init()
 	Player2.SetState(STATE_LOOKLEFT);
 
 	//Monster1 initialization
+	monsters1 = std::vector<Monster1>(NUM_MONSTERS);
 	for (int i = 0; i < NUM_MONSTERS; ++i)
 	{
-		monsters1[i].SetWidthHeight(32, 32);
-		monsters1[i].Randomise();
+		Monster1 monster;
+		monster.SetWidthHeight(32, 32);
+		monster.Randomise();
+		monsters1.push_back(monster);
 	}
 
 	//Menu initialization.
@@ -163,28 +166,36 @@ bool cGame::Process(float dt)
 	// Scene loader
 	sceneLoader.update(dt);
 	cScene& Scene = sceneLoader.currentScene();
-	
-	if(keys[GLUT_KEY_UP])			Player1.Jump(Scene.GetMap());
-	if(!keys[GLUT_KEY_UP])			Player1.StopJumping(Scene.GetMap());
-	if(keys[GLUT_KEY_LEFT])			Player1.MoveLeft(Scene.GetMap());
-	else if(keys[GLUT_KEY_RIGHT])	Player1.MoveRight(Scene.GetMap());
-	else Player1.Stop();
-	forward = !keys[9]; //tab key
-	//hadouken
-	if(forward)
+	Player2.IA(Scene.GetMap(),Player1.GetArea());
+	if(!Player1.isDead())
 	{
-		if(forward && keys[GLUT_KEY_RIGHT]) Player1.addInput(GLUT_KEY_RIGHT);
-		if(forward && keys[GLUT_KEY_LEFT]) Player1.addInput(GLUT_KEY_LEFT);
-		if(forward && keys[GLUT_KEY_DOWN]) Player1.addInput(GLUT_KEY_DOWN); 
-		if(forward && keys[32]) Player1.addInput(32);
+		if(keys[GLUT_KEY_UP])			Player1.Jump(Scene.GetMap());
+		if(!keys[GLUT_KEY_UP])			Player1.StopJumping(Scene.GetMap());
+		if(keys[GLUT_KEY_LEFT])			Player1.MoveLeft(Scene.GetMap());
+		else if(keys[GLUT_KEY_RIGHT])	Player1.MoveRight(Scene.GetMap());
+		else Player1.Stop();
+		forward = !keys[9]; //tab key
+		//hadouken
+		if(forward)
+		{
+			if(forward && keys[GLUT_KEY_RIGHT]) Player1.addInput(GLUT_KEY_RIGHT);
+			if(forward && keys[GLUT_KEY_LEFT]) Player1.addInput(GLUT_KEY_LEFT);
+			if(forward && keys[GLUT_KEY_DOWN]) Player1.addInput(GLUT_KEY_DOWN); 
+			if(forward && keys[32]) Player1.addInput(32);
+		}
 	}
+	else Player1.toSpawnZone(4,1);
+
 	//Game Logic
 	Player1.Logic(Scene.GetMap(),forward);
 	Player2.Logic(Scene.GetMap(),forward);
-	for (int i = 0; i < NUM_MONSTERS; ++i)
+	for (int i = 0; i < monsters1.size(); ++i)
 	{
 		monsters1[i].Logic(Scene.GetMap(), forward);
 	}
+
+	//collisions
+	Player1.MonstersCollisions(monsters1);
 
 	// Scene loader debug
 	static float last_load = 0.0f;
@@ -201,7 +212,7 @@ bool cGame::Process(float dt)
 void cGame::nextLevel ()
 {
 	// Generate random monsters.
-	for (int i = 0; i < NUM_MONSTERS; ++i)
+	for (int i = 0; i < monsters1.size(); ++i)
 	{
 		monsters1[i].Randomise();
 	}
@@ -249,7 +260,7 @@ void cGame::Render()
 		Player1.Draw(Data.GetID(IMG_PLAYER), forward);
 		Player2.Draw(Data.GetID(IMG_PLAYER), forward);
 
-		for (int i = 0; i < NUM_MONSTERS; ++i)
+		for (int i = 0; i < monsters1.size(); ++i)
 		{
 			monsters1[i].Draw(Data.GetID(IMG_PLAYER));
 		}

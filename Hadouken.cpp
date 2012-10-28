@@ -40,3 +40,13 @@ void Hadouken::logic()
 {
 	x += vx;
 }
+
+cRect Hadouken::getArea()
+{
+	cRect rect;
+	rect.left = x;
+	rect.right = x+w;
+	rect.bottom = y;
+	rect.top = y+h;
+	return rect;
+}
