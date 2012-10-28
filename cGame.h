@@ -29,7 +29,7 @@ public:
 	void Render();
 
 private:
-	static const int NUM_MONSTERS = 8;
+	static const int NUM_MONSTERS = 2;
 
 	enum Status
 	{ Menu

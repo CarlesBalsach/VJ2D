@@ -184,7 +184,11 @@ bool cGame::Process(float dt)
 			if(forward && keys[32]) Player1.addInput(32);
 		}
 	}
-	else Player1.toSpawnZone(4,1);
+	else
+	{
+		if (sceneLoader.isLoadingDone()) Player1.setDead (false);
+		else Player1.toSpawnZone(4,1);
+	}
 
 	//Game Logic
 	Player1.Logic(Scene.GetMap(),forward);
@@ -196,6 +200,18 @@ bool cGame::Process(float dt)
 
 	//collisions
 	Player1.MonstersCollisions(monsters1);
+
+	// Move on to the next level when all monsters have been killed.
+	bool all_dead = true;
+	for (int i = 0; i < monsters1.size(); ++i)
+	{
+		if (monsters1[i].isAlive())
+		{
+			all_dead = false;
+			break;
+		}
+	}
+	if (all_dead) nextLevel();
 
 	// Scene loader debug
 	static float last_load = 0.0f;
@@ -216,7 +232,7 @@ void cGame::nextLevel ()
 	{
 		monsters1[i].Randomise();
 	}
-
+	Player1.setDead (true);
 	sceneLoader.nextLevel();
 }
 
@@ -251,9 +267,7 @@ void cGame::Render()
 	}
 	else if (status == Playing)
 	{
-		if(forward) glColor4f(1,1,1,1);
-		else glColor4f(1,1,1,0.5f);
-
+		glColor3f(1,1,1);
 		glLoadIdentity();
 
 		sceneLoader.render(Data.GetID(IMG_BLOCKS));
@@ -265,7 +279,20 @@ void cGame::Render()
 			monsters1[i].Draw(Data.GetID(IMG_PLAYER));
 		}
 
-		if(!forward) drawBackInTime();
+		if(!forward)
+		{
+			drawBackInTime();
+			glColor4f (0.5f, 0.5f, 0.5f, 0.01f);
+			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glBegin (GL_QUADS);
+			glVertex2f (0, 0);
+			glVertex2f (GAME_WIDTH, 0);
+			glVertex2f (GAME_WIDTH, GAME_HEIGHT);
+			glVertex2f (0, GAME_HEIGHT);
+			glEnd ();
+			glDisable (GL_BLEND);
+		}
 	}
 
 	glutSwapBuffers();

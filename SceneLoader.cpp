@@ -3,7 +3,7 @@
 
 
 SceneLoader::SceneLoader (void)
-	: level (0), elapsed (0.0f), animationTime (1.0f), ty (0.0f), height(480.0f), scene_prev (0), scene_cur (0)
+	: level (0), elapsed (0.0f), animationTime (1.5f), ty (0.0f), height(480.0f), scene_prev (0), scene_cur (0)
 {
 }
 

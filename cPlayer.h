@@ -23,8 +23,11 @@ public:
 	void Stop();
 
 	void MonstersCollisions(vector<Monster1>& monsters1);
+	void setDead (bool val);
 	bool isDead();
 	void IA(int * map, cRect enemy);
+
+	int getLives () const;
 
 private:
 	void addHadouken();
