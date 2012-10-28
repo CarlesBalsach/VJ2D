@@ -3,6 +3,7 @@
 #include "cBicho.h"
 #include "Hadouken.h"
 #include <vector>
+#include "Monster1.h"
 
 #define STATE_SHOOTING_LEFT 4
 #define STATE_SHOOTING_RIGHT 5
@@ -22,6 +23,8 @@ public:
 	void Jump(int *map);
 	void StopJumping(int *map);
 	void Stop();
+
+	void MonstersCollisions(vector<Monster1>& monsters1);
 
 private:
 	void addHadouken();

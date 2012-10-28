@@ -156,3 +156,31 @@ void cPlayer::addHadouken()
 		hadoukens.push_back(Hadouken(hx,hy,hadoukenSpeed));
 	}
 }
+
+void cPlayer::MonstersCollisions(vector<Monster1>& monsters1)
+{
+	vector<Monster1>::iterator mit;
+	for(mit = monsters1.begin(); mit != monsters1.end(); mit++)
+	{
+		if(Collides(mit->GetArea()))
+		{
+			SetTile(4,1);
+			SetState(STATE_LOOKRIGHT);
+		}
+	}
+
+	for(mit = monsters1.begin(); mit != monsters1.end(); mit++)
+	{
+		vector<Hadouken>::iterator hit;
+		for(hit = hadoukens.begin(); hit != hadoukens.end(); hit++)
+		{
+			if(mit->Collides(hit->getArea()))
+			{
+				mit = monsters1.erase(mit);
+				hit = hadoukens.erase(hit);
+			}
+			if(hit == hadoukens.end()) break;
+		}
+		if(mit == monsters1.end()) break;
+	}
+}

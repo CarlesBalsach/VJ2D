@@ -44,10 +44,13 @@ bool cGame::Init()
 	Player2.SetState(STATE_LOOKLEFT);
 
 	//Monster1 initialization
+	monsters1 = std::vector<Monster1>(NUM_MONSTERS);
 	for (int i = 0; i < NUM_MONSTERS; ++i)
 	{
-		monsters1[i].SetWidthHeight(32, 32);
-		monsters1[i].Randomise();
+		Monster1 monster;
+		monster.SetWidthHeight(32, 32);
+		monster.Randomise();
+		monsters1.push_back(monster);
 	}
 
 	return res;
@@ -105,10 +108,13 @@ bool cGame::Process(float dt)
 	//Game Logic
 	Player1.Logic(Scene.GetMap(),forward);
 	Player2.Logic(Scene.GetMap(),forward);
-	for (int i = 0; i < NUM_MONSTERS; ++i)
+	for (int i = 0; i < monsters1.size(); ++i)
 	{
 		monsters1[i].Logic(Scene.GetMap(), forward);
 	}
+
+	//collisions
+	Player1.MonstersCollisions(monsters1);
 
 	// Scene loader debug
 	static float last_load = 0.0f;
@@ -125,7 +131,7 @@ bool cGame::Process(float dt)
 void cGame::nextLevel ()
 {
 	// Generate random monsters.
-	for (int i = 0; i < NUM_MONSTERS; ++i)
+	for (int i = 0; i < monsters1.size(); ++i)
 	{
 		monsters1[i].Randomise();
 	}
@@ -161,7 +167,7 @@ void cGame::Render()
 	Player1.Draw(Data.GetID(IMG_PLAYER), forward);
 	Player2.Draw(Data.GetID(IMG_PLAYER), forward);
 
-	for (int i = 0; i < NUM_MONSTERS; ++i)
+	for (int i = 0; i < monsters1.size(); ++i)
 	{
 		monsters1[i].Draw(Data.GetID(IMG_PLAYER));
 	}

@@ -1,4 +1,5 @@
 #include "cTexture.h"
+#include "cBicho.h"
 
 class Hadouken
 {
@@ -7,6 +8,7 @@ public:
 	~Hadouken();
 	void draw();
 	void logic();
+	cRect getArea();
 private:
 	cTexture tex;
 	int x,y;

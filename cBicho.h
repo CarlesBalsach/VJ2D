@@ -47,10 +47,10 @@ public:
 	void SetWidthHeight(int w,int h);
 	void GetWidthHeight(int *w,int *h);
 
-	bool Collides(cRect *rc);
+	bool Collides(cRect rc);
 	bool CollidesMapWall(int *map,bool right);
 	bool CollidesMapFloor(int *map);
-	void GetArea(cRect *rc);
+	cRect GetArea();
 	void DrawRect(int tex_id,float xo,float yo,float xf,float yf);
 
 	void MoveRight(int *map);
