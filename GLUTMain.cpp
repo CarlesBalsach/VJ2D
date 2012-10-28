@@ -34,6 +34,10 @@ void AppMouse(int button, int state, int x, int y)
 {
 	Game.ReadMouse(button,state,x,y);
 }
+void AppMotion (int x, int y)
+{
+	Game.MoveMouse(x, y);
+}
 
 float tick ()
 {
@@ -95,6 +99,8 @@ void main(int argc, char** argv)
 	glutSpecialFunc(AppSpecialKeys);	
 	glutSpecialUpFunc(AppSpecialKeysUp);
 	glutMouseFunc(AppMouse);
+	glutMotionFunc(AppMotion);
+	glutPassiveMotionFunc(AppMotion);
 	glutIdleFunc(AppIdle);
 
 	//Game initializations

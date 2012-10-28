@@ -24,7 +24,7 @@ bool cTexture::Load(char *filename,int type,int wraps,int wrapt,int magf,int min
 	}
 	else if(type==GL_RGBA)
 	{
-		//img = corona::OpenImage(filename,corona::PF_R8G8B8A8);
+		img = corona::OpenImage(filename,corona::PF_R8G8B8A8);
 		components = 4;
 	}
 	else return false;

@@ -1,10 +1,13 @@
 #include "cGame.h"
 #include "cScene.h"
 #include "Globals.h"
+#include <cstring> // memset
 
 
-cGame::cGame(void) : lastTick (0.0f)
+cGame::cGame(void) : lastTick (0.0f), status (Menu)
 {
+	memset (buttons, 0, sizeof(buttons));
+	memset (keys, 0, sizeof(keys));
 }
 
 cGame::~cGame(void)
@@ -16,7 +19,7 @@ bool cGame::Init()
 	bool res=true;
 
 	//Graphics initialization
-	glClearColor(0.2f,0.4f,0.7f,0.0f);
+	setStatus (Menu);
 	glDisable (GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -50,6 +53,9 @@ bool cGame::Init()
 		monsters1[i].Randomise();
 	}
 
+	//Menu initialization.
+	menu = Menu::create ();
+
 	return res;
 }
 
@@ -65,6 +71,7 @@ bool cGame::Loop(float dt)
 
 void cGame::Finalize()
 {
+	delete menu;
 }
 
 //Input
@@ -75,14 +82,83 @@ void cGame::ReadKeyboard(unsigned char key, int x, int y, bool press)
 
 void cGame::ReadMouse(int button, int state, int x, int y)
 {
+	buttons[button] = state == 0;
+}
+
+void cGame::MoveMouse(int x, int y)
+{
+	xmouse = x;
+	ymouse = y;
+}
+
+
+void cGame::setStatus (Status status)
+{
+	this->status = status;
+	if (status == Playing)
+	{
+		glClearColor(0.2f,0.4f,0.7f,0.0f);
+	}
+	else
+	{
+		glClearColor(0.75f,0.75f,0.75f,0.0f);
+	}
+
+	if (status == Playing) printf ("Playing\n");
+	else if (status == Credits) printf ("Credits\n");
+	else if (status == Help) printf ("Help\n");
+	else if (status == Menu) printf("Menu\n");
+}
+
+
+void cGame::translateMouse (float& x, float& y)
+{
+	GLint vp[4];
+	glGetIntegerv (GL_VIEWPORT, vp);
+	x = xmouse / (float) vp[2] * GAME_WIDTH;
+	y = GAME_HEIGHT - (ymouse / (float) vp[3] * GAME_HEIGHT);
 }
 
 //Process
 bool cGame::Process(float dt)
 {
-	bool res=true;
+	bool res = true;
+
 	//Process Input
-	if(keys[27])	res=false;
+	static float escDelay = 1.0f;
+	escDelay += dt;
+	if(keys[27] && escDelay >= 1.0f)
+	{
+		escDelay = 0.0f;
+		if (status != Menu)
+		{
+			setStatus(Menu);
+		}
+		else return false;
+	}
+
+	// Game menu
+	if (status == Menu && buttons[GLUT_LEFT_BUTTON])
+	{
+		float x, y;
+		translateMouse (x, y);
+		Menu::Action action = menu->process (x, y, GAME_WIDTH, GAME_HEIGHT);
+		
+		if (action == Menu::Play)
+		{
+			menu->setGameStarted (true);
+			setStatus(Playing);
+			return true;
+		}
+		else if (action != Menu::Quit)
+		{
+			if (action == Menu::Help) setStatus(Help);
+			else if (action == Menu::Credits) setStatus(Credits);
+			return true;
+		}
+		else return false;
+	}
+	else if (status != Playing) return true;
 
 	// Scene loader
 	sceneLoader.update(dt);
@@ -152,21 +228,34 @@ void cGame::Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	if(forward) glColor4f(1,1,1,1);
-	else glColor4f(1,1,1,0.5f);
-
-	glLoadIdentity();
-
-	sceneLoader.render(Data.GetID(IMG_BLOCKS));
-	Player1.Draw(Data.GetID(IMG_PLAYER), forward);
-	Player2.Draw(Data.GetID(IMG_PLAYER), forward);
-
-	for (int i = 0; i < NUM_MONSTERS; ++i)
+	if (status == Menu)
 	{
-		monsters1[i].Draw(Data.GetID(IMG_PLAYER));
+		float x, y;
+		translateMouse (x, y);
+		menu->render (x, y, GAME_WIDTH, GAME_HEIGHT);
 	}
+	else if (status == Credits)
+	{
+		menu->renderCredits (GAME_WIDTH, GAME_HEIGHT);
+	}
+	else if (status == Playing)
+	{
+		if(forward) glColor4f(1,1,1,1);
+		else glColor4f(1,1,1,0.5f);
 
-	if(!forward) drawBackInTime();
+		glLoadIdentity();
+
+		sceneLoader.render(Data.GetID(IMG_BLOCKS));
+		Player1.Draw(Data.GetID(IMG_PLAYER), forward);
+		Player2.Draw(Data.GetID(IMG_PLAYER), forward);
+
+		for (int i = 0; i < NUM_MONSTERS; ++i)
+		{
+			monsters1[i].Draw(Data.GetID(IMG_PLAYER));
+		}
+
+		if(!forward) drawBackInTime();
+	}
 
 	glutSwapBuffers();
 }
