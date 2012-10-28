@@ -51,7 +51,6 @@ void draw_scene (int tex_id, cScene* scene, float ty, float a)
 {
 	glColor4f (1.0f, 1.0f, 1.0f, a);
 	glPushMatrix ();
-	glLoadIdentity ();
 	glTranslatef (0.0f, ty, 0.0f);
 	scene->Draw (tex_id);
 	glPopMatrix ();
@@ -61,6 +60,7 @@ void draw_scene (int tex_id, cScene* scene, float ty, float a)
 void SceneLoader::render (int tex_id)
 {
 	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	float p = elapsed == 0.0f ? 1.0f : elapsed / animationTime;
 	if (scene_prev && scene_prev != scene_cur) draw_scene (tex_id, scene_prev, ty, 1.0f - p);
 	if (scene_cur) draw_scene (tex_id, scene_cur, 0.0f, p);
