@@ -28,20 +28,21 @@ public:
 
 private:
 
-	enum Label
+	enum Image
 	{ LabelPlay
 	, LabelHelp
 	, LabelCredits
 	, LabelQuit
 	, LabelContinue
 	, LabelNames
-	, NUM_LABELS
+	, Flowers
+	, NUM_IMAGES
 	};
 
-	cTexture labels[NUM_LABELS];
+	cTexture images[NUM_IMAGES];
 	bool gameStarted;
 
 	Menu (void);
 
-	void renderQuad (Label label, bool selected, float x0, float y0, float x1, float y1);
+	void renderQuad (Image img, bool selected, float x0, float y0, float x1, float y1);
 };

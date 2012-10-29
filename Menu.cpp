@@ -7,12 +7,13 @@ const float ymargin = 0.1f;
 
 Menu::Menu (void) : gameStarted (false)
 {
-	labels[LabelPlay].Load ("play.png");
-	labels[LabelHelp].Load ("help.png");
-	labels[LabelCredits].Load ("credits.png");
-	labels[LabelQuit].Load ("quit.png");
-	labels[LabelContinue].Load("continue.png");
-	labels[LabelNames].Load("names.png");
+	images[LabelPlay].Load ("play.png");
+	images[LabelHelp].Load ("help.png");
+	images[LabelCredits].Load ("credits.png");
+	images[LabelQuit].Load ("quit.png");
+	images[LabelContinue].Load("continue.png");
+	images[LabelNames].Load("names.png");
+	images[Flowers].Load("flowers.jpg");
 }
 
 
@@ -24,7 +25,7 @@ void freeTex (GLuint tex)
 
 Menu::~Menu (void)
 {
-	for (int i = 0; i < sizeof(labels); ++i) freeTex (labels[i].GetID());
+	for (int i = 0; i < NUM_IMAGES; ++i) freeTex (images[i].GetID());
 }
 
 
@@ -52,23 +53,24 @@ Menu::Action Menu::process (float xmouse, float ymouse, float width, float heigh
 }
 
 
-void renderBackground (float width, float height)
+void renderBackground (GLuint tex, float width, float height)
 {
+	glEnable (GL_TEXTURE_2D);
+	glBindTexture (GL_TEXTURE_2D, tex);
 	glBegin (GL_QUADS);
-	glColor3f (0.8f,0.8f,0.8f);
-	glVertex2f (0, 0);
-	glVertex2f (width, 0);
-	glColor3f (0.6f, 0.6f, 0.6f);
-	glVertex2f (width, height);
-	glVertex2f (0, height);
+	glTexCoord2f (1, 0); glVertex2f (0, 0);
+	glTexCoord2f (0, 0); glVertex2f (width, 0);
+	glTexCoord2f (0, 1); glVertex2f (width, height);
+	glTexCoord2f (1, 1); glVertex2f (0, height);
 	glEnd ();
+	glDisable (GL_TEXTURE_2D);
 }
 
 
-void Menu::renderQuad (Label label, bool highlight, float x0, float y0, float x1, float y1)
+void Menu::renderQuad (Image img, bool highlight, float x0, float y0, float x1, float y1)
 {
-	GLuint tex = labels[label].GetID();
-	if (highlight) glColor3f (0.7f, 0.8f, 0.9f);
+	GLuint tex = images[img].GetID();
+	if (highlight) glColor3f (0.7f, 0.8f, 1.0f);
 	else           glColor3f (0.2f, 0.5f, 0.8f);
 	glBindTexture (GL_TEXTURE_2D, tex);
 	glBegin (GL_QUADS);
@@ -81,6 +83,7 @@ void Menu::renderQuad (Label label, bool highlight, float x0, float y0, float x1
 	glTexCoord2f (1, 0);
 	glVertex2f (x1, y0);
 	glEnd ();
+	glColor4f (1, 1, 1, 1);
 }
 
 
@@ -94,7 +97,7 @@ void Menu::render (float xmouse, float ymouse, float width, float height)
 
 	Action action = process (xmouse, ymouse, width, height);
 
-	renderBackground (width, height);
+	renderBackground (images[Flowers].GetID(), width, height);
 	glEnable (GL_TEXTURE_2D);
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -116,7 +119,7 @@ void Menu::render (float xmouse, float ymouse, float width, float height)
 
 void Menu::renderCredits (float width, float height)
 {
-	renderBackground (width, height);
+	renderBackground (images[Flowers].GetID(), width, height);
 	glEnable (GL_TEXTURE_2D);
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
