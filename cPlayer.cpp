@@ -198,12 +198,9 @@ void cPlayer::MonstersCollisions(vector<Monster1>& monsters1)
 			if(mit->isAlive() && Collides(mit->GetArea()))
 			{
 				lives--;
-				if(lives == 0)
-				{
-					//some code here
-				}
 				dead = true;
 				state = STATE_DEAD;
+				return;
 			}
 		}
 	}
@@ -215,7 +212,6 @@ void cPlayer::MonstersCollisions(vector<Monster1>& monsters1)
 		{
 			if(mit->isAlive() && mit->Collides(hit->getArea()))
 			{
-				printf ("monster hit\n");
 				mit->setAlive (false);
 				hit = hadoukens.erase(hit);
 			}
