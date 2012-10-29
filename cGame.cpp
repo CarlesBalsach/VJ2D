@@ -225,7 +225,7 @@ bool cGame::Process(float dt)
 			if(forward && keys[32]) Player1.addInput(32);
 		}
 	}
-	else
+	else if (!isGameOver)
 	{
 		int x, y;
 		Player1.GetTile (&x, &y);
