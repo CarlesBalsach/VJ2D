@@ -97,7 +97,7 @@ void Monster2::Logic (int *map, bool forward, float dt, float width, float heigh
 	}
 
 	// Randomly shoot at the player
-	if (!allBulletsUsed() && (rand() % 100) == 0)
+	if (!allBulletsUsed() && (rand() % 200) == 0)
 	{
 		int i = nextAliveBullet();
 		Bullet& b = bullets[i];
