@@ -30,6 +30,8 @@ public:
 
 	cScene& currentScene ();
 
+	int getCurrentLevel ();
+
 	void setAnimationTime (float val);
 
 	void setViewportHeight (int val);

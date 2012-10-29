@@ -91,6 +91,12 @@ cScene& SceneLoader::currentScene ()
 }
 
 
+int SceneLoader::getCurrentLevel ()
+{
+	return level;
+}
+
+
 void SceneLoader::setAnimationTime (float val)
 {
 	animationTime = val;

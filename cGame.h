@@ -32,7 +32,8 @@ public:
 
 private:
 	static const int NUM_MONSTERS  = 1;
-	static const int NUM_MONSTERS2 = 1;
+	static const int NUM_MONSTERS2 = 2;
+	static const int NUM_LEVELS = 3;
 
 	enum Status
 	{ Menu
@@ -65,11 +66,14 @@ private:
 	float lastTick;
 	float deathTime;
 	float gameOverElapsed;
+	float youWinElapsed;
 	bool invulnerable;
+	bool isGameOver;
 
 	cTexture heart;
 	cTexture bullet;
 	cTexture turret;
 	cTexture gameOver;
 	cTexture youWin;
+	cTexture flowers;
 };

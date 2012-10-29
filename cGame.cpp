@@ -6,6 +6,7 @@
 
 static const float gameOverTime = 6.0f;
 static const float gameOverAnim = 3.0f;
+static const float resetTime = 2.0f;
 
 
 cGame::cGame(void) : forward (false), lastTick (0.0f), status (Menu), invulnerable (false)
@@ -75,8 +76,11 @@ bool cGame::Init()
 	turret.Load ("turret.png");
 	gameOver.Load ("game-over.png");
 	youWin.Load ("you-win.png");
+	flowers.Load ("hearts.png");
 
 	gameOverElapsed = 0.0f;
+	youWinElapsed = 0.0f;
+	isGameOver = false;
 
 	return res;
 }
@@ -88,7 +92,11 @@ void cGame::Reset ()
 	menu->setGameStarted (false);
 	setStatus (Menu);
 	gameOverElapsed = 0.0f;
+	youWinElapsed = 0.0f;
 	Player1.setLives (3);
+	isGameOver = false;
+	invulnerable = false;
+	printf ("reset\n");
 }
 
 bool cGame::Loop(float dt)
@@ -113,6 +121,7 @@ void cGame::Finalize()
 	freeTex (turret.GetID());
 	freeTex (gameOver.GetID());
 	freeTex (youWin.GetID());
+	freeTex (flowers.GetID());
 	delete menu;
 }
 
@@ -241,20 +250,23 @@ bool cGame::Process(float dt)
 	//Game Logic
 	Player1.Logic(Scene.GetMap(),forward);
 	Player2.Logic(Scene.GetMap(),forward);
-	for (int i = 0; i < monsters1.size(); ++i)
+	if (!isGameOver)
 	{
-		monsters1[i].Logic(Scene.GetMap(), forward);
-	}
-	int px, py;
-	Player1.GetPosition(&px, &py);
-	for (int i = 0; i < NUM_MONSTERS2; ++i)
-	{
-		monsters2[i].Logic(Scene.GetMap(), forward, dt, GAME_WIDTH, GAME_HEIGHT, px, py);
+		for (int i = 0; i < monsters1.size(); ++i)
+		{
+			monsters1[i].Logic(Scene.GetMap(), forward);
+		}
+		int px, py;
+		Player1.GetPosition(&px, &py);
+		for (int i = 0; i < NUM_MONSTERS2; ++i)
+		{
+			monsters2[i].Logic(Scene.GetMap(), forward, dt, GAME_WIDTH, GAME_HEIGHT, px, py);
+		}
 	}
 
 	//collisions
 	bool wasDead = Player1.isDead();
-	if (!Player1.isDead() && !invulnerable)
+	if (!Player1.isDead() && !invulnerable && !isGameOver)
 	{
 		cRect playerRect = Player1.GetArea ();
 		Player1.MonstersCollisions(monsters1);
@@ -288,16 +300,29 @@ bool cGame::Process(float dt)
 			break;
 		}
 	}
-	if (all_dead) nextLevel();
+	if (all_dead && !isGameOver)
+	{
+		nextLevel();
+	}
 
 	// Game over logic
 	if (Player1.getLives() <= 0)
 	{
+		isGameOver = true;
 		gameOverElapsed += dt;
 	}
 	if (gameOverElapsed >= gameOverTime)
 	{
 		Reset ();
+	}
+
+	// You win logic
+	if (sceneLoader.getCurrentLevel() > NUM_LEVELS)
+	{
+		invulnerable = true;
+		isGameOver = true;
+		youWinElapsed += dt;
+		if (youWinElapsed >= gameOverTime) Reset ();
 	}
 
 	// Scene loader debug
@@ -314,17 +339,20 @@ bool cGame::Process(float dt)
 
 void cGame::nextLevel ()
 {
+	sceneLoader.nextLevel();
 	// Generate random monsters.
-	for (int i = 0; i < monsters1.size(); ++i)
+	if (sceneLoader.getCurrentLevel() <= NUM_LEVELS)
 	{
-		monsters1[i].Randomise();
-	}
-	for (int i = 0; i < NUM_MONSTERS2; ++i)
-	{
-		monsters2[i].Randomise();
+		for (int i = 0; i < monsters1.size(); ++i)
+		{
+			monsters1[i].Randomise();
+		}
+		for (int i = 0; i < NUM_MONSTERS2; ++i)
+		{
+			monsters2[i].Randomise();
+		}
 	}
 	Player1.setDead (true);
-	sceneLoader.nextLevel();
 }
 
 void cGame::drawBackInTime()
@@ -360,6 +388,17 @@ void cGame::Render()
 	{
 		glColor3f (1, 1, 1);
 		glLoadIdentity();
+
+		// Render background
+		glEnable (GL_TEXTURE_2D);
+		glBindTexture (GL_TEXTURE_2D, flowers.GetID());
+		glBegin (GL_QUADS);
+		glTexCoord2f (1, 1); glVertex2f (0,          0);
+		glTexCoord2f (0, 1); glVertex2f (GAME_WIDTH, 0);
+		glTexCoord2f (0, 0); glVertex2f (GAME_WIDTH, GAME_HEIGHT);
+		glTexCoord2f (1, 0); glVertex2f (0,          GAME_HEIGHT);
+		glEnd ();
+		glDisable (GL_TEXTURE_2D);
 
 		sceneLoader.render(Data.GetID(IMG_BLOCKS));
 		Player1.Draw(Data.GetID(IMG_PLAYER), forward);
@@ -419,6 +458,25 @@ void cGame::Render()
 			glColor4f (0.8f, 0.0f, 0.0f, gameOverElapsed / gameOverAnim);
 			glEnable (GL_TEXTURE_2D);
 			glBindTexture (GL_TEXTURE_2D, gameOver.GetID());
+			glBegin (GL_QUADS);
+			glTexCoord2f (0, 1); glVertex2f (0,          0);
+			glTexCoord2f (1, 1); glVertex2f (GAME_WIDTH, 0);
+			glTexCoord2f (1, 0); glVertex2f (GAME_WIDTH, GAME_HEIGHT);
+			glTexCoord2f (0, 0); glVertex2f (0,          GAME_HEIGHT);
+			glEnd ();
+			glDisable (GL_TEXTURE_2D);
+			glDisable (GL_BLEND);
+			glColor4f (1, 1, 1, 1);
+		}
+
+		// Draw you win
+		if (sceneLoader.getCurrentLevel() > NUM_LEVELS)
+		{
+			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glColor4f (0.2f, 0.7f, 0.2f, youWinElapsed / gameOverAnim);
+			glEnable (GL_TEXTURE_2D);
+			glBindTexture (GL_TEXTURE_2D, youWin.GetID());
 			glBegin (GL_QUADS);
 			glTexCoord2f (0, 1); glVertex2f (0,          0);
 			glTexCoord2f (1, 1); glVertex2f (GAME_WIDTH, 0);
