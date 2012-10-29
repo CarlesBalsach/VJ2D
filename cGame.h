@@ -31,7 +31,7 @@ public:
 	void Render();
 
 private:
-	static const int NUM_MONSTERS  = 1;
+	static const int NUM_MONSTERS  = 5;
 	static const int NUM_MONSTERS2 = 2;
 	static const int NUM_LEVELS = 3;
 
