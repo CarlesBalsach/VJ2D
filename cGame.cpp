@@ -406,7 +406,7 @@ void cGame::Render()
 
 		sceneLoader.render(Data.GetID(IMG_BLOCKS));
 		Player1.Draw(Data.GetID(IMG_PLAYER), forward);
-		Player2.Draw(Data.GetID(IMG_PLAYER), forward);
+		//Player2.Draw(Data.GetID(IMG_PLAYER), forward);
 
 		for (int i = 0; i < monsters1.size(); ++i)
 		{

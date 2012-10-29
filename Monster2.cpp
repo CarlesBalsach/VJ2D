@@ -60,6 +60,7 @@ void Monster2::Randomise ()
 	{
 		bullets[i].alive = false;
 	}
+	lastShotElapsed = 0.0f;
 }
 
 
@@ -97,7 +98,7 @@ void Monster2::Logic (int *map, bool forward, float dt, float width, float heigh
 	}
 
 	// Randomly shoot at the player
-	if (!allBulletsUsed() && (rand() % 200) == 0)
+	if (!allBulletsUsed() && lastShotElapsed >= 3.0f && (rand() % 50) == 0)
 	{
 		int i = nextAliveBullet();
 		Bullet& b = bullets[i];
@@ -110,7 +111,9 @@ void Monster2::Logic (int *map, bool forward, float dt, float width, float heigh
 		norm = norm == 0.0f ? 1.0f : 1.0f / norm;
 		b.vx *= norm;
 		b.vy *= norm;
+		lastShotElapsed = 0.0f;
 	}
+	else lastShotElapsed += dt;
 }
 
 

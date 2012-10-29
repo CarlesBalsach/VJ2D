@@ -7,6 +7,7 @@ class Monster2 : public cBicho
 	enum Direction { left, right };
 	Direction dir;
 	bool alive;
+	float lastShotElapsed;
 
 	class Bullet
 	{
