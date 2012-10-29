@@ -15,6 +15,16 @@ SceneLoader::~SceneLoader (void)
 }
 
 
+void SceneLoader::restart ()
+{
+	if (scene_prev && scene_prev != scene_cur) delete scene_prev;
+	if (scene_cur) delete scene_cur;
+	level = 0;
+	scene_prev = 0;
+	scene_cur = 0;
+}
+
+
 bool SceneLoader::nextLevel ()
 {
 	level++;

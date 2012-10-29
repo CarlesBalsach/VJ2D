@@ -18,6 +18,8 @@ public:
 
 	~SceneLoader (void);
 
+	void restart ();
+
 	bool nextLevel ();
 
 	void update (float dt);

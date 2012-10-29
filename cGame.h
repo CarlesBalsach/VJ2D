@@ -17,6 +17,7 @@ public:
 	virtual ~cGame(void);
 
 	bool Init();
+	void Reset();
 	bool Loop(float dt);
 	void Finalize();
 
@@ -30,8 +31,8 @@ public:
 	void Render();
 
 private:
-	static const int NUM_MONSTERS  = 5;
-	static const int NUM_MONSTERS2 = 2;
+	static const int NUM_MONSTERS  = 1;
+	static const int NUM_MONSTERS2 = 1;
 
 	enum Status
 	{ Menu
@@ -63,6 +64,7 @@ private:
 
 	float lastTick;
 	float deathTime;
+	float gameOverElapsed;
 	bool invulnerable;
 
 	cTexture heart;

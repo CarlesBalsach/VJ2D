@@ -4,6 +4,10 @@
 #include <cstring> // memset
 
 
+static const float gameOverTime = 6.0f;
+static const float gameOverAnim = 3.0f;
+
+
 cGame::cGame(void) : forward (false), lastTick (0.0f), status (Menu), invulnerable (false)
 {
 	memset (buttons, 0, sizeof(buttons));
@@ -19,8 +23,7 @@ bool cGame::Init()
 	bool res=true;
 
 	//Graphics initialization
-	glClearColor(0.2f,0.4f,0.7f,0.0f);
-	setStatus (Menu);
+	glClearColor(1.0f,1.0f,1.0f,1.0f);
 	glDisable (GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -64,6 +67,7 @@ bool cGame::Init()
 
 	//Menu initialization.
 	menu = Menu::create ();
+	setStatus (Menu);
 
 	// UI initialization.
 	heart.Load ("red-heart.png");
@@ -72,7 +76,19 @@ bool cGame::Init()
 	gameOver.Load ("game-over.png");
 	youWin.Load ("you-win.png");
 
+	gameOverElapsed = 0.0f;
+
 	return res;
+}
+
+void cGame::Reset ()
+{
+	sceneLoader.restart();
+	nextLevel();
+	menu->setGameStarted (false);
+	setStatus (Menu);
+	gameOverElapsed = 0.0f;
+	Player1.setLives (3);
 }
 
 bool cGame::Loop(float dt)
@@ -242,13 +258,16 @@ bool cGame::Process(float dt)
 	{
 		cRect playerRect = Player1.GetArea ();
 		Player1.MonstersCollisions(monsters1);
-		for (int i = 0; i < NUM_MONSTERS2; ++i)
+		if (!Player1.isDead())
 		{
-			if (monsters2[i].collides(playerRect))
+			for (int i = 0; i < NUM_MONSTERS2; ++i)
 			{
-				Player1.setDead (true);
-				Player1.setLives (Player1.getLives() - 1);
-				Player1.SetState(STATE_DEAD);
+				if (monsters2[i].collides(playerRect))
+				{
+					Player1.setDead (true);
+					Player1.setLives (Player1.getLives() - 1);
+					Player1.SetState(STATE_DEAD);
+				}
 			}
 		}
 	}
@@ -270,6 +289,16 @@ bool cGame::Process(float dt)
 		}
 	}
 	if (all_dead) nextLevel();
+
+	// Game over logic
+	if (Player1.getLives() <= 0)
+	{
+		gameOverElapsed += dt;
+	}
+	if (gameOverElapsed >= gameOverTime)
+	{
+		Reset ();
+	}
 
 	// Scene loader debug
 	static float last_load = 0.0f;
@@ -329,7 +358,7 @@ void cGame::Render()
 	}
 	else if (status == Playing)
 	{
-		glColor3f(1,1,1);
+		glColor3f (1, 1, 1);
 		glLoadIdentity();
 
 		sceneLoader.render(Data.GetID(IMG_BLOCKS));
@@ -381,6 +410,25 @@ void cGame::Render()
 		}
 		glEnd ();
 		glDisable (GL_TEXTURE_2D);
+
+		// Draw game over
+		if (Player1.getLives() <= 0)
+		{
+			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glColor4f (0.8f, 0.0f, 0.0f, gameOverElapsed / gameOverAnim);
+			glEnable (GL_TEXTURE_2D);
+			glBindTexture (GL_TEXTURE_2D, gameOver.GetID());
+			glBegin (GL_QUADS);
+			glTexCoord2f (0, 1); glVertex2f (0,          0);
+			glTexCoord2f (1, 1); glVertex2f (GAME_WIDTH, 0);
+			glTexCoord2f (1, 0); glVertex2f (GAME_WIDTH, GAME_HEIGHT);
+			glTexCoord2f (0, 0); glVertex2f (0,          GAME_HEIGHT);
+			glEnd ();
+			glDisable (GL_TEXTURE_2D);
+			glDisable (GL_BLEND);
+			glColor4f (1, 1, 1, 1);
+		}
 	}
 
 	glutSwapBuffers();
