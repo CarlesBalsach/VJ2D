@@ -243,6 +243,12 @@ void cPlayer::IA(int * map, cRect enemy)
 }
 
 
+void cPlayer::setLives (int val)
+{
+	lives = val;
+}
+
+
 int cPlayer::getLives () const
 {
 	return lives;

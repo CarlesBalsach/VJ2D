@@ -3,6 +3,7 @@
 #include "SceneLoader.h"
 #include "cPlayer.h"
 #include "Monster1.h"
+#include "Monster2.h"
 #include "cData.h"
 #include "Menu.h"
 
@@ -29,7 +30,8 @@ public:
 	void Render();
 
 private:
-	static const int NUM_MONSTERS = 2;
+	static const int NUM_MONSTERS  = 5;
+	static const int NUM_MONSTERS2 = 2;
 
 	enum Status
 	{ Menu
@@ -53,10 +55,19 @@ private:
 	cPlayer Player1;
 	cPlayer Player2;
 	std::vector<Monster1> monsters1;
+	Monster2 monsters2[NUM_MONSTERS2];
 	cData Data;
 	::Menu* menu;
 
 	Status status;
 
 	float lastTick;
+	float deathTime;
+	bool invulnerable;
+
+	cTexture heart;
+	cTexture bullet;
+	cTexture turret;
+	cTexture gameOver;
+	cTexture youWin;
 };

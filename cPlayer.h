@@ -27,6 +27,7 @@ public:
 	bool isDead();
 	void IA(int * map, cRect enemy);
 
+	void setLives (int val);
 	int getLives () const;
 
 private:

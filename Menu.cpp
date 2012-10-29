@@ -7,13 +7,12 @@ const float ymargin = 0.1f;
 
 Menu::Menu (void) : gameStarted (false)
 {
-	labels[LabelPlay].Load ("play.gif");
-	labels[LabelHelp].Load ("help.gif");
-	labels[LabelCredits].Load ("credits.gif");
-	labels[LabelQuit].Load ("quit.gif");
-	labels[LabelContinue].Load("continue.gif");
-	labels[LabelCarles].Load("carles.gif");
-	labels[LabelMarc].Load("marc.gif");
+	labels[LabelPlay].Load ("play.png");
+	labels[LabelHelp].Load ("help.png");
+	labels[LabelCredits].Load ("credits.png");
+	labels[LabelQuit].Load ("quit.png");
+	labels[LabelContinue].Load("continue.png");
+	labels[LabelNames].Load("names.png");
 }
 
 
@@ -53,11 +52,24 @@ Menu::Action Menu::process (float xmouse, float ymouse, float width, float heigh
 }
 
 
-void Menu::renderQuad (int label, bool highlight, float x0, float y0, float x1, float y1)
+void renderBackground (float width, float height)
+{
+	glBegin (GL_QUADS);
+	glColor3f (0.8f,0.8f,0.8f);
+	glVertex2f (0, 0);
+	glVertex2f (width, 0);
+	glColor3f (0.6f, 0.6f, 0.6f);
+	glVertex2f (width, height);
+	glVertex2f (0, height);
+	glEnd ();
+}
+
+
+void Menu::renderQuad (Label label, bool highlight, float x0, float y0, float x1, float y1)
 {
 	GLuint tex = labels[label].GetID();
-	if (highlight) glColor3f (0.3f, 0.5f, 0.9f);
-	else           glColor3f (0.5f, 0.7f, 0.8f);
+	if (highlight) glColor3f (0.7f, 0.8f, 0.9f);
+	else           glColor3f (0.2f, 0.5f, 0.8f);
 	glBindTexture (GL_TEXTURE_2D, tex);
 	glBegin (GL_QUADS);
 	glTexCoord2f (0, 0);
@@ -82,6 +94,7 @@ void Menu::render (float xmouse, float ymouse, float width, float height)
 
 	Action action = process (xmouse, ymouse, width, height);
 
+	renderBackground (width, height);
 	glEnable (GL_TEXTURE_2D);
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -103,17 +116,11 @@ void Menu::render (float xmouse, float ymouse, float width, float height)
 
 void Menu::renderCredits (float width, float height)
 {
-	float xstart = width * xmargin;
-	float ystart = height - height * ymargin;
-	float xend = width - width * xmargin;
-	float yend = height * ymargin;
-	float step = (yend - ystart) / 2.0f;
-
+	renderBackground (width, height);
 	glEnable (GL_TEXTURE_2D);
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	renderQuad (LabelCarles, true, xstart, ystart, xend, ystart + step);
-	renderQuad (LabelMarc,   true, xstart, ystart + step,   xend, ystart + 2*step);
+	renderQuad (LabelNames, false, 0, height, width, 0);
 	glDisable (GL_BLEND);
 	glDisable (GL_TEXTURE_2D);
 }

@@ -4,7 +4,7 @@
 #include <cstring> // memset
 
 
-cGame::cGame(void) : forward (false), lastTick (0.0f), status (Menu)
+cGame::cGame(void) : forward (false), lastTick (0.0f), status (Menu), invulnerable (false)
 {
 	memset (buttons, 0, sizeof(buttons));
 	memset (keys, 0, sizeof(keys));
@@ -19,6 +19,7 @@ bool cGame::Init()
 	bool res=true;
 
 	//Graphics initialization
+	glClearColor(0.2f,0.4f,0.7f,0.0f);
 	setStatus (Menu);
 	glDisable (GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
@@ -54,8 +55,22 @@ bool cGame::Init()
 		monsters1[i].Randomise();
 	}
 
+	//Monster2 initialization
+	for (int i = 0; i < NUM_MONSTERS2; ++i)
+	{
+		monsters2[i].SetWidthHeight(32, 32);
+		monsters2[i].Randomise();
+	}
+
 	//Menu initialization.
 	menu = Menu::create ();
+
+	// UI initialization.
+	heart.Load ("red-heart.png");
+	bullet.Load ("fireball.png");
+	turret.Load ("turret.png");
+	gameOver.Load ("game-over.png");
+	youWin.Load ("you-win.png");
 
 	return res;
 }
@@ -70,8 +85,18 @@ bool cGame::Loop(float dt)
 	return res;
 }
 
+static void freeTex (GLuint tex)
+{
+	glDeleteTextures (1, &tex);
+}
+
 void cGame::Finalize()
 {
+	freeTex (heart.GetID());
+	freeTex (bullet.GetID());
+	freeTex (turret.GetID());
+	freeTex (gameOver.GetID());
+	freeTex (youWin.GetID());
 	delete menu;
 }
 
@@ -96,15 +121,6 @@ void cGame::MoveMouse(int x, int y)
 void cGame::setStatus (Status status)
 {
 	this->status = status;
-	if (status == Playing)
-	{
-		glClearColor(0.2f,0.4f,0.7f,0.0f);
-	}
-	else
-	{
-		glClearColor(0.75f,0.75f,0.75f,0.0f);
-	}
-
 	if (status == Playing) printf ("Playing\n");
 	else if (status == Credits) printf ("Credits\n");
 	else if (status == Help) printf ("Help\n");
@@ -186,8 +202,24 @@ bool cGame::Process(float dt)
 	}
 	else
 	{
-		if (sceneLoader.isLoadingDone()) Player1.setDead (false);
-		else Player1.toSpawnZone(4,1);
+		int x, y;
+		Player1.GetTile (&x, &y);
+		if (x == 4 && y == 1)
+		{
+			Player1.setDead (false);
+			Player1.SetState(STATE_LOOKRIGHT);
+		}
+		else
+		{
+			Player1.toSpawnZone(4,1);
+			Player1.setDead (true);
+		}
+	}
+
+	deathTime += dt;
+	if (deathTime >= 3.0f)
+	{
+		invulnerable = false;
 	}
 
 	//Game Logic
@@ -197,9 +229,35 @@ bool cGame::Process(float dt)
 	{
 		monsters1[i].Logic(Scene.GetMap(), forward);
 	}
+	int px, py;
+	Player1.GetPosition(&px, &py);
+	for (int i = 0; i < NUM_MONSTERS2; ++i)
+	{
+		monsters2[i].Logic(Scene.GetMap(), forward, dt, GAME_WIDTH, GAME_HEIGHT, px, py);
+	}
 
 	//collisions
-	Player1.MonstersCollisions(monsters1);
+	bool wasDead = Player1.isDead();
+	if (!Player1.isDead() && !invulnerable)
+	{
+		cRect playerRect = Player1.GetArea ();
+		Player1.MonstersCollisions(monsters1);
+		for (int i = 0; i < NUM_MONSTERS2; ++i)
+		{
+			if (monsters2[i].collides(playerRect))
+			{
+				Player1.setDead (true);
+				Player1.setLives (Player1.getLives() - 1);
+				Player1.SetState(STATE_DEAD);
+			}
+		}
+	}
+
+	if (!wasDead && Player1.isDead())
+	{
+		invulnerable = true;
+		deathTime = 0.0f;
+	}
 
 	// Move on to the next level when all monsters have been killed.
 	bool all_dead = true;
@@ -231,6 +289,10 @@ void cGame::nextLevel ()
 	for (int i = 0; i < monsters1.size(); ++i)
 	{
 		monsters1[i].Randomise();
+	}
+	for (int i = 0; i < NUM_MONSTERS2; ++i)
+	{
+		monsters2[i].Randomise();
 	}
 	Player1.setDead (true);
 	sceneLoader.nextLevel();
@@ -279,6 +341,13 @@ void cGame::Render()
 			monsters1[i].Draw(Data.GetID(IMG_PLAYER));
 		}
 
+		GLuint texTurret = turret.GetID();
+		GLuint texBullet = bullet.GetID();
+		for (int i = 0; i < NUM_MONSTERS2; ++i)
+		{
+			monsters2[i].Draw(texTurret, texBullet);
+		}
+
 		if(!forward)
 		{
 			drawBackInTime();
@@ -292,7 +361,26 @@ void cGame::Render()
 			glVertex2f (0, GAME_HEIGHT);
 			glEnd ();
 			glDisable (GL_BLEND);
+			glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
 		}
+
+		// Draw hearts
+		float s = 32.0f;
+		float x = 5.0f;
+		glEnable (GL_TEXTURE_2D);
+		glBindTexture (GL_TEXTURE_2D, heart.GetID());
+		glBegin (GL_QUADS);
+		for (int i = 0; i < Player1.getLives(); ++i)
+		{
+			float y = GAME_HEIGHT-10.0f;
+			glTexCoord2f (0, 0); glVertex2f (x,   y);
+			glTexCoord2f (0, 1); glVertex2f (x,   y-s);
+			glTexCoord2f (1, 1); glVertex2f (x+s, y-s);
+			glTexCoord2f (1, 0); glVertex2f (x+s, y);
+			x += s + 5.0f;
+		}
+		glEnd ();
+		glDisable (GL_TEXTURE_2D);
 	}
 
 	glutSwapBuffers();

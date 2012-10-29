@@ -34,8 +34,7 @@ private:
 	, LabelCredits
 	, LabelQuit
 	, LabelContinue
-	, LabelCarles
-	, LabelMarc
+	, LabelNames
 	, NUM_LABELS
 	};
 
@@ -44,5 +43,5 @@ private:
 
 	Menu (void);
 
-	void renderQuad (int action, bool selected, float x0, float y0, float x1, float y1);
+	void renderQuad (Label label, bool selected, float x0, float y0, float x1, float y1);
 };
