@@ -14,6 +14,7 @@ Menu::Menu (void) : gameStarted (false)
 	images[LabelContinue].Load("continue.png");
 	images[LabelNames].Load("names.png");
 	images[Flowers].Load("flowers.jpg");
+	images[Controls].Load("controls.png");
 }
 
 
@@ -124,6 +125,18 @@ void Menu::renderCredits (float width, float height)
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	renderQuad (LabelNames, false, 0, height, width, 0);
+	glDisable (GL_BLEND);
+	glDisable (GL_TEXTURE_2D);
+}
+
+
+void Menu::renderHelp (float width, float height)
+{
+	renderBackground (images[Flowers].GetID(), width, height);
+	glEnable (GL_TEXTURE_2D);
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	renderQuad (Controls, false, 0, height, width, 0);
 	glDisable (GL_BLEND);
 	glDisable (GL_TEXTURE_2D);
 }

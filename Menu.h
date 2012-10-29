@@ -24,6 +24,8 @@ public:
 
 	void renderCredits (float width, float height);
 
+	void renderHelp (float width, float height);
+
 	void setGameStarted (bool val);
 
 private:
@@ -36,6 +38,7 @@ private:
 	, LabelContinue
 	, LabelNames
 	, Flowers
+	, Controls
 	, NUM_IMAGES
 	};
 

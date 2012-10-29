@@ -380,6 +380,10 @@ void cGame::Render()
 		translateMouse (x, y);
 		menu->render (x, y, GAME_WIDTH, GAME_HEIGHT);
 	}
+	else if (status == Help)
+	{
+		menu->renderHelp (GAME_WIDTH, GAME_HEIGHT);
+	}
 	else if (status == Credits)
 	{
 		menu->renderCredits (GAME_WIDTH, GAME_HEIGHT);
